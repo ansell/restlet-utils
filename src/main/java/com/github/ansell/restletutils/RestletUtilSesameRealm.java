@@ -795,15 +795,15 @@ public class RestletUtilSesameRealm extends Realm
             }
             
         }
-        catch(RepositoryException e)
+        catch(final RepositoryException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
-        catch(MalformedQueryException e)
+        catch(final MalformedQueryException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
-        catch(QueryEvaluationException e)
+        catch(final QueryEvaluationException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
@@ -1398,15 +1398,15 @@ public class RestletUtilSesameRealm extends Realm
             }
             
         }
-        catch(RepositoryException e)
+        catch(final RepositoryException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
-        catch(MalformedQueryException e)
+        catch(final MalformedQueryException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
-        catch(QueryEvaluationException e)
+        catch(final QueryEvaluationException e)
         {
             throw new RuntimeException("Failure finding user in repository", e);
         }
