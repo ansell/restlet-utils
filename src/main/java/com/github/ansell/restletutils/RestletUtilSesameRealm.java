@@ -30,6 +30,8 @@ package com.github.ansell.restletutils;
  * Restlet is a registered trademark of Restlet S.A.S.
  */
 
+import info.aduna.iteration.Iterations;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -373,8 +375,8 @@ public class RestletUtilSesameRealm extends Realm
             conn.setAutoCommit(false);
             
             final List<Statement> userIdentifierStatements =
-                    conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                            this.vf.createLiteral(nextUser.getIdentifier()), true, this.getContexts()).asList();
+                    Iterations.asList(conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                            this.vf.createLiteral(nextUser.getIdentifier()), true, this.getContexts()));
             
             // FIXME: Is it safe to overwrite old users like this...
             if(!userIdentifierStatements.isEmpty())
@@ -390,8 +392,8 @@ public class RestletUtilSesameRealm extends Realm
                     }
                     
                     final List<Statement> currentUserStatements =
-                            conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null, true,
-                                    this.getContexts()).asList();
+                            Iterations.asList(conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null,
+                                    true, this.getContexts()));
                     
                     // remove all of the previously known statements
                     conn.remove(currentUserStatements, this.getContexts());
@@ -499,7 +501,7 @@ public class RestletUtilSesameRealm extends Realm
         {
             // get the statements for the nextGroupUri
             final List<Statement> nextRootGroupStatements =
-                    conn.getStatements(nextGroupUri, null, null, true, this.getContexts()).asList();
+                    Iterations.asList(conn.getStatements(nextGroupUri, null, null, true, this.getContexts()));
             // create the group
             final Group newGroup = this.createGroupForStatements(nextRootGroupStatements);
             
@@ -514,8 +516,8 @@ public class RestletUtilSesameRealm extends Realm
                     this.getContexts()))
             {
                 final List<Statement> nextMemberGroupStatements =
-                        conn.getStatements(nextGroupUri, SesameRealmConstants.OAS_GROUPMEMBERGROUP, null, true,
-                                this.getContexts()).asList();
+                        Iterations.asList(conn.getStatements(nextGroupUri, SesameRealmConstants.OAS_GROUPMEMBERGROUP, null, true,
+                                this.getContexts()));
                 
                 for(final Statement nextMemberGroupStatement : nextMemberGroupStatements)
                 {
@@ -562,8 +564,8 @@ public class RestletUtilSesameRealm extends Realm
             conn.setAutoCommit(false);
             
             final List<Statement> userIdentifierStatements =
-                    conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
-                            this.vf.createLiteral(nextUser.getIdentifier()), true, this.getContexts()).asList();
+                    Iterations.asList(conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
+                            this.vf.createLiteral(nextUser.getIdentifier()), true, this.getContexts()));
             
             if(!userIdentifierStatements.isEmpty())
             {
@@ -578,8 +580,8 @@ public class RestletUtilSesameRealm extends Realm
                     }
                     
                     final List<Statement> currentUserStatements =
-                            conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null, true,
-                                    this.getContexts()).asList();
+                            Iterations.asList(conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null, true,
+                                    this.getContexts()));
                     
                     // remove all of the previously known statements
                     conn.remove(currentUserStatements, this.getContexts());
@@ -866,7 +868,7 @@ public class RestletUtilSesameRealm extends Realm
                         // dump all of these statements into a list as the size will be relatively
                         // constant and small for all scenarios
                         final List<Statement> nextRoleMappingStatements =
-                                conn.getStatements(nextRoleMappingUri, null, null, true, this.getContexts()).asList();
+                                Iterations.asList(conn.getStatements(nextRoleMappingUri, null, null, true, this.getContexts()));
                         
                         for(final Statement nextRoleMappingStatement : nextRoleMappingStatements)
                         {
