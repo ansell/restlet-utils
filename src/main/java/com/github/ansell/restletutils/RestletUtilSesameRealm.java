@@ -257,7 +257,7 @@ public class RestletUtilSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            conn.setAutoCommit(false);
+            conn.begin();
             
             final URI nextRoleMappingUUID = this.vf.createURI("urn:oas:rolemapping:", UUID.randomUUID().toString());
             
@@ -326,7 +326,7 @@ public class RestletUtilSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            conn.setAutoCommit(false);
+            conn.begin();
             
             this.storeGroup(nextRootGroup, conn, true);
             
@@ -372,7 +372,7 @@ public class RestletUtilSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            conn.setAutoCommit(false);
+            conn.begin();
             
             final List<Statement> userIdentifierStatements =
                     Iterations.asList(conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
@@ -458,6 +458,52 @@ public class RestletUtilSesameRealm extends Realm
         return nextUserUUID;
     }
     
+    /**
+     * Builds a RestletUtilUser from the data retrieved in a SPARQL result.
+     * 
+     * @param userIdentifier
+     *            The unique identifier of the User.
+     * @param bindingSet
+     *            Results of a single user from SPARQL.
+     * @return A RestletUtilUser account.
+     * 
+     */
+    protected RestletUtilUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
+    {
+        RestletUtilUser result;
+        result =
+                new RestletUtilUser(userIdentifier, bindingSet.getValue("userSecret").stringValue(), bindingSet
+                        .getValue("userFirstName").stringValue(), bindingSet.getValue("userLastName").stringValue(),
+                        bindingSet.getValue("userEmail").stringValue());
+        return result;
+    }
+    
+    /**
+     * Builds a SPARQL query to retrieve details of a RestletUtilUser. This method could be
+     * overridden to search for other information regarding a user.
+     * 
+     * @param userIdentifier
+     *            The unique identifier of the User to search for.
+     * @return A String representation of the SPARQL Select query
+     */
+    protected String buildSparqlQueryToFindUser(final String userIdentifier)
+    {
+        final StringBuilder query = new StringBuilder();
+        
+        query.append(" SELECT ?userUri ?userSecret ?userFirstName ?userLastName ?userEmail ");
+        query.append(" WHERE ");
+        query.append(" { ");
+        query.append("   ?userUri a <" + SesameRealmConstants.OAS_USER + "> . ");
+        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ?userIdentifier . ");
+        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERSECRET + "> ?userSecret . ");
+        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ?userFirstName . } ");
+        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERLASTNAME + "> ?userLastName . } ");
+        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USEREMAIL + "> ?userEmail . } ");
+        query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
+        query.append(" } ");
+        return query.toString();
+    }
+    
     private Group createGroupForStatements(final List<Statement> nextGroupStatements)
     {
         final Group nextGroup = new Group();
@@ -516,8 +562,8 @@ public class RestletUtilSesameRealm extends Realm
                     this.getContexts()))
             {
                 final List<Statement> nextMemberGroupStatements =
-                        Iterations.asList(conn.getStatements(nextGroupUri, SesameRealmConstants.OAS_GROUPMEMBERGROUP, null, true,
-                                this.getContexts()));
+                        Iterations.asList(conn.getStatements(nextGroupUri, SesameRealmConstants.OAS_GROUPMEMBERGROUP,
+                                null, true, this.getContexts()));
                 
                 for(final Statement nextMemberGroupStatement : nextMemberGroupStatements)
                 {
@@ -561,7 +607,7 @@ public class RestletUtilSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            conn.setAutoCommit(false);
+            conn.begin();
             
             final List<Statement> userIdentifierStatements =
                     Iterations.asList(conn.getStatements(null, SesameRealmConstants.OAS_USERIDENTIFIER,
@@ -580,8 +626,8 @@ public class RestletUtilSesameRealm extends Realm
                     }
                     
                     final List<Statement> currentUserStatements =
-                            Iterations.asList(conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null, true,
-                                    this.getContexts()));
+                            Iterations.asList(conn.getStatements(nextUserIdentifierStatement.getSubject(), null, null,
+                                    true, this.getContexts()));
                     
                     // remove all of the previously known statements
                     conn.remove(currentUserStatements, this.getContexts());
@@ -807,54 +853,6 @@ public class RestletUtilSesameRealm extends Realm
         
         return result;
     }
-
-    /**
-     * Builds a SPARQL query to retrieve details of a RestletUtilUser. This method could be
-     * overridden to search for other information regarding a user.
-     * 
-     * @param userIdentifier
-     *            The unique identifier of the User to search for.
-     * @return A String representation of the SPARQL Select query
-     */
-    protected String buildSparqlQueryToFindUser(final String userIdentifier)
-    {
-        final StringBuilder query = new StringBuilder();
-        
-        query.append(" SELECT ?userUri ?userSecret ?userFirstName ?userLastName ?userEmail ");
-        query.append(" WHERE ");
-        query.append(" { ");
-        query.append("   ?userUri a <" + SesameRealmConstants.OAS_USER + "> . ");
-        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ?userIdentifier . ");
-        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERSECRET + "> ?userSecret . ");
-        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ?userFirstName . } ");
-        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERLASTNAME + "> ?userLastName . } ");
-        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USEREMAIL + "> ?userEmail . } ");
-        query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
-        query.append(" } ");
-        return query.toString();
-    }
-
-    /**
-     * Builds a RestletUtilUser from the data retrieved in a SPARQL result.  
-     * 
-     * @param userIdentifier
-     *            The unique identifier of the User.
-     * @param bindingSet
-     *            Results of a single user from SPARQL.
-     * @return A RestletUtilUser account.
-     *          
-     */
-    protected RestletUtilUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
-    {
-        RestletUtilUser result;
-        result =
-                new RestletUtilUser(userIdentifier, 
-                        bindingSet.getValue("userSecret").stringValue(),
-                        bindingSet.getValue("userFirstName").stringValue(), 
-                        bindingSet.getValue("userLastName").stringValue(),
-                        bindingSet.getValue("userEmail").stringValue());
-        return result;
-    }
     
     public URI[] getContexts()
     {
@@ -900,7 +898,8 @@ public class RestletUtilSesameRealm extends Realm
                         // dump all of these statements into a list as the size will be relatively
                         // constant and small for all scenarios
                         final List<Statement> nextRoleMappingStatements =
-                                Iterations.asList(conn.getStatements(nextRoleMappingUri, null, null, true, this.getContexts()));
+                                Iterations.asList(conn.getStatements(nextRoleMappingUri, null, null, true,
+                                        this.getContexts()));
                         
                         for(final Statement nextRoleMappingStatement : nextRoleMappingStatements)
                         {
@@ -1366,7 +1365,7 @@ public class RestletUtilSesameRealm extends Realm
         try
         {
             conn = this.repository.getConnection();
-            
+            conn.begin();
             final StringBuilder query = new StringBuilder();
             
             final RestletUtilRole oasRole = RestletUtilRoles.getRoleByName(role.getName());
@@ -1392,6 +1391,7 @@ public class RestletUtilSesameRealm extends Realm
             }
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
+            tupleQuery.setDataset(this.getSesameDataset());
             
             final TupleQueryResult queryResult = tupleQuery.evaluate();
             
@@ -1430,18 +1430,42 @@ public class RestletUtilSesameRealm extends Realm
             {
                 queryResult.close();
             }
-            
+            conn.commit();
         }
         catch(final RepositoryException e)
         {
+            try
+            {
+                conn.rollback();
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Repository Exception while rolling back connection");
+            }
             throw new RuntimeException("Failure finding user in repository", e);
         }
         catch(final MalformedQueryException e)
         {
+            try
+            {
+                conn.rollback();
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Repository Exception while rolling back connection");
+            }
             throw new RuntimeException("Failure finding user in repository", e);
         }
         catch(final QueryEvaluationException e)
         {
+            try
+            {
+                conn.rollback();
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Repository Exception while rolling back connection");
+            }
             throw new RuntimeException("Failure finding user in repository", e);
         }
         finally

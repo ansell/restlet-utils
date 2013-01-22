@@ -41,7 +41,7 @@ public class CrossOriginResourceSharingFilter extends Filter
         if(responseHeaders == null)
         {
             responseHeaders = new Series<Header>(Header.class);
-            Series<Header> putIfAbsent =
+            final Series<Header> putIfAbsent =
                     (Series<Header>)responseAttributes.putIfAbsent(HeaderConstants.ATTRIBUTE_HEADERS, responseHeaders);
             
             if(putIfAbsent != null)
