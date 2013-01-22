@@ -265,7 +265,7 @@ public class RestletUtilSesameRealm extends Realm
                     this.getContexts());
             
             conn.add(this.vf.createStatement(nextRoleMappingUUID, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
-                    RestletUtilRoles.getRoleByName(nextMapping.getTarget().getName()).getURI()), this.getContexts());
+                    this.getRoleByName(nextMapping.getTarget().getName()).getURI()), this.getContexts());
             
             if(nextMapping.getSource() instanceof Group)
             {
@@ -914,8 +914,7 @@ public class RestletUtilSesameRealm extends Realm
                                     // matching roles out of the
                                     // repository to objects
                                     
-                                    final RestletUtilRole nextStandardRole =
-                                            RestletUtilRoles.getRoleByUri((URI)nextRoleMappingStatement.getObject());
+                                    final RestletUtilRole nextStandardRole = this.getRoleByUri((URI)nextRoleMappingStatement.getObject());
                                     
                                     if(nextStandardRole == null)
                                     {
@@ -1047,6 +1046,27 @@ public class RestletUtilSesameRealm extends Realm
         }
         
         return results;
+    }
+
+    /**
+     * @param role
+     * @return
+     */
+    protected RestletUtilRole getRoleByName(final String name)
+    {
+        final RestletUtilRole oasRole = RestletUtilRoles.getRoleByName(name);
+        return oasRole;
+    }
+    
+    /**
+     * @param nextRoleMappingStatement
+     * @return
+     */
+    protected RestletUtilRole getRoleByUri(final URI uri)
+    {
+        final RestletUtilRole nextStandardRole =
+                RestletUtilRoles.getRoleByUri(uri);
+        return nextStandardRole;
     }
     
     /**
@@ -1369,7 +1389,7 @@ public class RestletUtilSesameRealm extends Realm
             
             final StringBuilder query = new StringBuilder();
             
-            final RestletUtilRole oasRole = RestletUtilRoles.getRoleByName(role.getName());
+            final RestletUtilRole oasRole = this.getRoleByName(role.getName());
             
             if(oasRole == null)
             {
@@ -1457,5 +1477,5 @@ public class RestletUtilSesameRealm extends Realm
         }
         
     }
-    
+
 }
