@@ -751,26 +751,14 @@ public class RestletUtilSesameRealm extends Realm
         {
             conn = this.repository.getConnection();
             
-            final StringBuilder query = new StringBuilder();
-            
-            query.append(" SELECT ?userUri ?userSecret ?userFirstName ?userLastName ?userEmail ");
-            query.append(" WHERE ");
-            query.append(" { ");
-            query.append("   ?userUri a <" + SesameRealmConstants.OAS_USER + "> . ");
-            query.append("   ?userUri <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ?userIdentifier . ");
-            query.append("   ?userUri <" + SesameRealmConstants.OAS_USERSECRET + "> ?userSecret . ");
-            query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ?userFirstName . } ");
-            query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERLASTNAME + "> ?userLastName . } ");
-            query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USEREMAIL + "> ?userEmail . } ");
-            query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
-            query.append(" } ");
+            final String query = this.buildSparqlQueryToFindUser(userIdentifier);
             
             if(this.log.isDebugEnabled())
             {
-                this.log.debug("findUser: query={}", query.toString());
+                this.log.debug("findUser: query={}", query);
             }
             
-            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query.toString());
+            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
             final TupleQueryResult queryResult = tupleQuery.evaluate();
             
@@ -780,11 +768,7 @@ public class RestletUtilSesameRealm extends Realm
                 {
                     final BindingSet bindingSet = queryResult.next();
                     
-                    result =
-                            new RestletUtilUser(userIdentifier, bindingSet.getValue("userSecret").stringValue(),
-                                    bindingSet.getValue("userFirstName").stringValue(), bindingSet.getValue(
-                                            "userLastName").stringValue(), bindingSet.getValue("userEmail")
-                                            .stringValue());
+                    result = this.buildRestletUserFromSparqlResult(userIdentifier, bindingSet);
                 }
                 else
                 {
@@ -821,6 +805,54 @@ public class RestletUtilSesameRealm extends Realm
             }
         }
         
+        return result;
+    }
+
+    /**
+     * Builds a SPARQL query to retrieve details of a RestletUtilUser. This method could be
+     * overridden to search for other information regarding a user.
+     * 
+     * @param userIdentifier
+     *            The unique identifier of the User to search for.
+     * @return A String representation of the SPARQL Select query
+     */
+    protected String buildSparqlQueryToFindUser(final String userIdentifier)
+    {
+        final StringBuilder query = new StringBuilder();
+        
+        query.append(" SELECT ?userUri ?userSecret ?userFirstName ?userLastName ?userEmail ");
+        query.append(" WHERE ");
+        query.append(" { ");
+        query.append("   ?userUri a <" + SesameRealmConstants.OAS_USER + "> . ");
+        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ?userIdentifier . ");
+        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERSECRET + "> ?userSecret . ");
+        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ?userFirstName . } ");
+        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERLASTNAME + "> ?userLastName . } ");
+        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USEREMAIL + "> ?userEmail . } ");
+        query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
+        query.append(" } ");
+        return query.toString();
+    }
+
+    /**
+     * Builds a RestletUtilUser from the data retrieved in a SPARQL result.  
+     * 
+     * @param userIdentifier
+     *            The unique identifier of the User.
+     * @param bindingSet
+     *            Results of a single user from SPARQL.
+     * @return A RestletUtilUser account.
+     *          
+     */
+    protected RestletUtilUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
+    {
+        RestletUtilUser result;
+        result =
+                new RestletUtilUser(userIdentifier, 
+                        bindingSet.getValue("userSecret").stringValue(),
+                        bindingSet.getValue("userFirstName").stringValue(), 
+                        bindingSet.getValue("userLastName").stringValue(),
+                        bindingSet.getValue("userEmail").stringValue());
         return result;
     }
     
