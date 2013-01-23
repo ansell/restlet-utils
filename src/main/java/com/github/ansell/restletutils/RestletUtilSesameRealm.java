@@ -472,6 +472,8 @@ public class RestletUtilSesameRealm extends Realm
      */
     protected RestletUtilUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
     {
+        log.info("result={}", bindingSet);
+        
         String userEmail = bindingSet.getValue("userEmail").stringValue();
         char[] userSecret = bindingSet.getValue("userSecret").stringValue().toCharArray();
         String userFirstName = null;
