@@ -283,6 +283,7 @@ public class RestletUtilSesameRealm extends Realm
             }
             else
             {
+                conn.rollback();
                 throw new RuntimeException("Could not map role for unknown source type: "
                         + nextMapping.getSource().getClass().getName());
             }
