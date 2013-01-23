@@ -472,12 +472,20 @@ public class RestletUtilSesameRealm extends Realm
      */
     protected RestletUtilUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
     {
-        RestletUtilUser result;
-        result =
-                new RestletUtilUser(userIdentifier, bindingSet.getValue("userSecret").stringValue(), bindingSet
-                        .getValue("userFirstName").stringValue(), bindingSet.getValue("userLastName").stringValue(),
-                        bindingSet.getValue("userEmail").stringValue());
-        return result;
+        String userEmail = bindingSet.getValue("userEmail").stringValue();
+        char[] userSecret = bindingSet.getValue("userSecret").stringValue().toCharArray();
+        String userFirstName = null;
+        if(bindingSet.hasBinding("userFirstName"))
+        {
+            userFirstName = bindingSet.getValue("userFirstName").stringValue();
+        }
+        String userLastName = null;
+        if(bindingSet.hasBinding("userLastName"))
+        {
+            userLastName = bindingSet.getValue("userLastName").stringValue();
+        }
+        
+        return new RestletUtilUser(userIdentifier, userSecret, userFirstName, userLastName, userEmail);
     }
     
     /**
