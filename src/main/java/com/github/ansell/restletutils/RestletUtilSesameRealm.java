@@ -115,7 +115,8 @@ public class RestletUtilSesameRealm extends Realm
                     clientInfo.getRoles().add(role);
                 }
                 
-                if(clientInfo.isAuthenticated())
+                if(clientInfo.isAuthenticated()
+                        && !clientInfo.getRoles().contains(RestletUtilRoles.AUTHENTICATED.getRole()))
                 {
                     clientInfo.getRoles().add(RestletUtilRoles.AUTHENTICATED.getRole());
                 }
@@ -264,8 +265,8 @@ public class RestletUtilSesameRealm extends Realm
             conn.add(this.vf.createStatement(nextRoleMappingUUID, RDF.TYPE, SesameRealmConstants.OAS_ROLEMAPPING),
                     this.getContexts());
             
-            conn.add(this.vf.createStatement(nextRoleMappingUUID, SesameRealmConstants.OAS_ROLEMAPPEDROLE,
-                    this.getRoleByName(nextMapping.getTarget().getName()).getURI()), this.getContexts());
+            conn.add(this.vf.createStatement(nextRoleMappingUUID, SesameRealmConstants.OAS_ROLEMAPPEDROLE, this
+                    .getRoleByName(nextMapping.getTarget().getName()).getURI()), this.getContexts());
             
             if(nextMapping.getSource() instanceof Group)
             {
@@ -913,7 +914,8 @@ public class RestletUtilSesameRealm extends Realm
                                     // matching roles out of the
                                     // repository to objects
                                     
-                                    final RestletUtilRole nextStandardRole = this.getRoleByUri((URI)nextRoleMappingStatement.getObject());
+                                    final RestletUtilRole nextStandardRole =
+                                            this.getRoleByUri((URI)nextRoleMappingStatement.getObject());
                                     
                                     if(nextStandardRole == null)
                                     {
@@ -1046,7 +1048,7 @@ public class RestletUtilSesameRealm extends Realm
         
         return results;
     }
-
+    
     /**
      * @param role
      * @return
@@ -1063,8 +1065,7 @@ public class RestletUtilSesameRealm extends Realm
      */
     protected RestletUtilRole getRoleByUri(final URI uri)
     {
-        final RestletUtilRole nextStandardRole =
-                RestletUtilRoles.getRoleByUri(uri);
+        final RestletUtilRole nextStandardRole = RestletUtilRoles.getRoleByUri(uri);
         return nextStandardRole;
     }
     
@@ -1501,5 +1502,5 @@ public class RestletUtilSesameRealm extends Realm
         }
         
     }
-
+    
 }
