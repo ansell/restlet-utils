@@ -30,7 +30,7 @@ public enum RestletUtilRoles implements RestletUtilRole
     {
         for(final RestletUtilRole nextRole : RestletUtilRoles.values())
         {
-            if(nextRole.getName().equals(name))
+            if(nextRole.getRole().getName().equals(name))
             {
                 return nextRole;
             }
