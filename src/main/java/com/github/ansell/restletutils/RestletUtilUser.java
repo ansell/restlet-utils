@@ -171,6 +171,17 @@ public class RestletUtilUser extends User implements Principal
             return false;
         }
         final RestletUtilUser other = (RestletUtilUser)obj;
+        if(this.identifier == null)
+        {
+            if(other.identifier != null)
+            {
+                return false;
+            }
+        }
+        else if(!this.identifier.equals(other.identifier))
+        {
+            return false;
+        }
         if(this.email == null)
         {
             if(other.email != null)
@@ -190,17 +201,6 @@ public class RestletUtilUser extends User implements Principal
             }
         }
         else if(!this.firstName.equals(other.firstName))
-        {
-            return false;
-        }
-        if(this.identifier == null)
-        {
-            if(other.identifier != null)
-            {
-                return false;
-            }
-        }
-        else if(!this.identifier.equals(other.identifier))
         {
             return false;
         }
