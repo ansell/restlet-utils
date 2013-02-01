@@ -782,7 +782,7 @@ public class RestletUtilSesameRealm extends Realm
             if((user != null) && user.equals(source))
             {
                 // TODO: Fix this hardcoding when Restlet implements equals for Role objects again
-                RestletUtilRole standardRole = RestletUtilRoles.getRoleByName(mapping.getTarget().getName());
+                RestletUtilRole standardRole = this.getRoleByName(mapping.getTarget().getName());
                 if(standardRole != null)
                 {
                     result.add(standardRole.getRole());
