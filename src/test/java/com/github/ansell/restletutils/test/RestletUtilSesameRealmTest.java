@@ -57,6 +57,7 @@ public class RestletUtilSesameRealmTest
     private Role testRoleAdmin;
     private Role testRoleAuthenticated;
     private RestletUtilUser testUserAuthenticated;
+    private RestletUtilUser testUser2;
     
     /**
      * @throws java.lang.Exception
@@ -80,6 +81,8 @@ public class RestletUtilSesameRealmTest
         
         this.testUserAuthenticated =
                 new RestletUtilUser("testUser1", "mySecret", "Mr Test", "User", "test_user1@example.org");
+        
+        this.testUser2 = new RestletUtilUser("testUser2", "mySecret2", "Mr Test2", "User2", "test_user2@example.com");
         
         this.testRoleAdmin = RestletUtilRoles.ADMIN.getRole();
         this.testRoleAuthenticated = RestletUtilRoles.AUTHENTICATED.getRole();
@@ -356,6 +359,65 @@ public class RestletUtilSesameRealmTest
         this.testRealm.addRootGroup(this.testGroupNotInheriting);
         
         Assert.assertFalse(this.testRealm.getRootGroups().isEmpty());
+    }
+    
+    /**
+     * Test method for {@link com.github.ansell.restletutils.RestletUtilSesameRealm#getUsers()}.
+     */
+    @Test
+    public final void testGetUsersEmpty() throws Exception
+    {
+        final List<RestletUtilUser> emptyUsers = this.testRealm.getUsers();
+        
+        Assert.assertTrue(emptyUsers.isEmpty());
+    }
+    
+    /**
+     * Test method for {@link com.github.ansell.restletutils.RestletUtilSesameRealm#getUsers()}.
+     */
+    @Test
+    public final void testGetUsersMultiple() throws Exception
+    {
+        this.testRealm.addUser(this.testUserAuthenticated);
+        
+        final List<RestletUtilUser> allUsers = this.testRealm.getUsers();
+        
+        Assert.assertEquals(1, allUsers.size());
+        Assert.assertEquals(this.testUserAuthenticated, allUsers.get(0));
+        
+        this.log.info("allUsers: {}", allUsers);
+        
+        this.testRealm.addUser(this.testUser2);
+        
+        final List<RestletUtilUser> allUsers2 = this.testRealm.getUsers();
+        
+        Assert.assertEquals(2, allUsers2.size());
+        
+        this.log.info("allUsers2: {}", allUsers2);
+        for(final RestletUtilUser nextUser : allUsers2)
+        {
+            if(nextUser.equals(this.testUserAuthenticated) || nextUser.equals(this.testUser2))
+            {
+                this.log.info("found a match: {}", nextUser);
+            }
+            else
+            {
+                Assert.fail("Could not find a match for: " + nextUser.toString());
+            }
+        }
+    }
+    
+    /**
+     * Test method for {@link com.github.ansell.restletutils.RestletUtilSesameRealm#getUsers()}.
+     */
+    @Test
+    public final void testGetUsersSingle() throws Exception
+    {
+        this.testRealm.addUser(this.testUserAuthenticated);
+        
+        final List<RestletUtilUser> allUsers = this.testRealm.getUsers();
+        
+        Assert.assertEquals(1, allUsers.size());
     }
     
     /**
