@@ -33,6 +33,7 @@ package com.github.ansell.restletutils;
 import info.aduna.iteration.Iterations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.vocabulary.RDF;
+import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
 import org.openrdf.query.Dataset;
 import org.openrdf.query.MalformedQueryException;
@@ -472,7 +474,7 @@ public class RestletUtilSesameRealm extends Realm
      */
     protected RestletUtilUser buildRestletUserFromSparqlResult(final String userIdentifier, final BindingSet bindingSet)
     {
-        log.info("result={}", bindingSet);
+        // log.info("result={}", bindingSet);
         
         String userEmail = bindingSet.getValue("userEmail").stringValue();
         char[] userSecret = bindingSet.getValue("userSecret").stringValue().toCharArray();
@@ -498,11 +500,16 @@ public class RestletUtilSesameRealm extends Realm
      *            The unique identifier of the User to search for.
      * @return A String representation of the SPARQL Select query
      */
-    protected String buildSparqlQueryToFindUser(final String userIdentifier)
+    protected String buildSparqlQueryToFindUser(final String userIdentifier, boolean findAllUsers)
     {
+        if(!findAllUsers && userIdentifier == null)
+        {
+            throw new NullPointerException("User identifier was null");
+        }
+        
         final StringBuilder query = new StringBuilder();
         
-        query.append(" SELECT ?userUri ?userSecret ?userFirstName ?userLastName ?userEmail ");
+        query.append(" SELECT ?userIdentifier ?userUri ?userSecret ?userFirstName ?userLastName ?userEmail ");
         query.append(" WHERE ");
         query.append(" { ");
         query.append("   ?userUri a <" + SesameRealmConstants.OAS_USER + "> . ");
@@ -511,7 +518,10 @@ public class RestletUtilSesameRealm extends Realm
         query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ?userFirstName . } ");
         query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERLASTNAME + "> ?userLastName . } ");
         query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USEREMAIL + "> ?userEmail . } ");
-        query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
+        if(!findAllUsers)
+        {
+            query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
+        }
         query.append(" } ");
         return query.toString();
     }
@@ -818,7 +828,7 @@ public class RestletUtilSesameRealm extends Realm
         {
             conn = this.repository.getConnection();
             
-            final String query = this.buildSparqlQueryToFindUser(userIdentifier);
+            final String query = this.buildSparqlQueryToFindUser(userIdentifier, false);
             
             if(this.log.isDebugEnabled())
             {
@@ -1194,10 +1204,67 @@ public class RestletUtilSesameRealm extends Realm
      * 
      * @return The modifiable list of users.
      */
-    private List<RestletUtilUser> getUsers()
+    public List<RestletUtilUser> getUsers()
     {
-        throw new RuntimeException("TODO: Implement code not to rely on ever getting a complete list of users");
-        // return this.users;
+        List<RestletUtilUser> result = new ArrayList<RestletUtilUser>();
+        
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repository.getConnection();
+            
+            final String query = this.buildSparqlQueryToFindUser(null, true);
+            
+            if(this.log.isDebugEnabled())
+            {
+                this.log.debug("findUser: query={}", query);
+            }
+            
+            final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
+            
+            final TupleQueryResult queryResult = tupleQuery.evaluate();
+            
+            try
+            {
+                while(queryResult.hasNext())
+                {
+                    final BindingSet bindingSet = queryResult.next();
+                    Binding binding = bindingSet.getBinding("userIdentifier");
+                    
+                    result.add(this.buildRestletUserFromSparqlResult(binding.getValue().stringValue(), bindingSet));
+                }
+            }
+            finally
+            {
+                queryResult.close();
+            }
+            
+        }
+        catch(final RepositoryException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        catch(final MalformedQueryException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        catch(final QueryEvaluationException e)
+        {
+            throw new RuntimeException("Failure finding user in repository", e);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(final RepositoryException e)
+            {
+                this.log.error("Failure to close connection", e);
+            }
+        }
+        
+        return result;
     }
     
     /**
