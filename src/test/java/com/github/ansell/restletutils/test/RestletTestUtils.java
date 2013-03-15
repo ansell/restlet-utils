@@ -27,7 +27,7 @@ public class RestletTestUtils
     public static final String TEST_ADMIN_USERNAME = "testAdminUser";
     
     public static Representation doTestAuthenticatedRequest(final ClientResource clientResource,
-            final Method requestMethod, final Object inputRepresentation, final MediaType requestMediaType,
+            final Method requestMethod, final Representation inputRepresentation, final MediaType requestMediaType,
             final Status expectedResponseStatus, final boolean requiresAdminPrivileges)
     {
         Representation result = null;
