@@ -193,7 +193,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
             response.redirectSeeOther(Reference.decode(targetUri));
         }
         
-        if(this.getFixedRedirectUri() != null && !this.getFixedRedirectUri().trim().isEmpty())
+        if(this.getFixedRedirectUri() != null)
         {
             this.log.info("attemptRedirect: fixedRedirectUri={}", this.getFixedRedirectUri());
             response.redirectSeeOther(this.getFixedRedirectUri());
