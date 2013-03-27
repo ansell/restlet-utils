@@ -66,9 +66,9 @@ public enum RestletUtilRoles implements RestletUtilRole
         return result;
     }
     
-    private Role role;
+    private final Role role;
     
-    private URI uri;
+    private final URI uri;
     
     RestletUtilRoles(final String roleName, final String description, final String uriString)
     {
