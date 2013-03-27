@@ -42,4 +42,11 @@ public interface RestletUtilRole
      */
     URI getURI();
     
+    /**
+     * 
+     * @return True if this role can be assigned to users and false if it is only assigned by the
+     *         system based on some internal state.
+     */
+    boolean isAssignable();
+    
 }

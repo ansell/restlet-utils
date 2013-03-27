@@ -21,10 +21,27 @@ import org.restlet.security.Role;
 public enum RestletUtilRoles implements RestletUtilRole
 {
     ADMIN("Administrator", "An administrator of the Ontology Annotation Services Application",
-            "http://purl.org/oas/ontology/roles/administrator"),
+            "http://purl.org/oas/ontology/roles/administrator", true),
     
     AUTHENTICATED("Authenticated User", "A user of the Ontology Annotation Services Application",
-            "http://purl.org/oas/ontology/roles/authenticated");
+            "http://purl.org/oas/ontology/roles/authenticated", false);
+    
+    public static List<Role> getAssignableRoles()
+    {
+        final List<Role> result = new ArrayList<Role>(RestletUtilRoles.values().length);
+        
+        for(final RestletUtilRole nextRole : RestletUtilRoles.values())
+        {
+            if(nextRole.isAssignable())
+            {
+                // WARNING: After Restlet-2.1RC5 Roles will only be considered equal if they are the
+                // same java object, so this must not create a new Role each time
+                result.add(nextRole.getRole());
+            }
+        }
+        
+        return result;
+    }
     
     public static RestletUtilRole getRoleByName(final String name)
     {
@@ -70,10 +87,13 @@ public enum RestletUtilRoles implements RestletUtilRole
     
     private final URI uri;
     
-    RestletUtilRoles(final String roleName, final String description, final String uriString)
+    private final boolean assignable;
+    
+    RestletUtilRoles(final String roleName, final String description, final String uriString, final boolean assignable)
     {
         this.role = new Role(roleName, description);
         this.uri = ValueFactoryImpl.getInstance().createURI(uriString);
+        this.assignable = assignable;
     }
     
     /**
@@ -104,6 +124,15 @@ public enum RestletUtilRoles implements RestletUtilRole
     public URI getURI()
     {
         return this.uri;
+    }
+    
+    /**
+     * @return the assignable
+     */
+    @Override
+    public boolean isAssignable()
+    {
+        return this.assignable;
     }
     
 }
