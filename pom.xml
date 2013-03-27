@@ -49,7 +49,7 @@
 		<junit.version>4.11</junit.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<restlet.version>2.1.2</restlet.version>
+		<restlet.version>2.1.1</restlet.version>
 		<sesame.version>2.7.0-beta3-SNAPSHOT</sesame.version>
 		<slf4j.version>1.7.4</slf4j.version>
 	</properties>
