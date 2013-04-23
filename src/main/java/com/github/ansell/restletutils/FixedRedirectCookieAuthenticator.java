@@ -195,12 +195,12 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         
         if(this.getFixedRedirectUri() != null)
         {
-            this.log.info("attemptRedirect: fixedRedirectUri={}", this.getFixedRedirectUri());
+            this.log.debug("attemptRedirect: fixedRedirectUri={}", this.getFixedRedirectUri());
             response.redirectSeeOther(this.getFixedRedirectUri());
         }
         else
         {
-            this.log.info("attemptRedirect: fixedRedirectUri={}",
+            this.log.debug("attemptRedirect: fixedRedirectUri={}",
                     FixedRedirectCookieAuthenticator.DEFAULT_FIXED_REDIRECT_URI);
             response.redirectSeeOther(FixedRedirectCookieAuthenticator.DEFAULT_FIXED_REDIRECT_URI);
         }
@@ -221,7 +221,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
             request.setChallengeResponse(this.parseCredentials(credentialsCookie.getValue()));
         }
         
-        this.log.info("Calling super.authenticate");
+        this.log.debug("Calling super.authenticate");
         return super.authenticate(request, response);
     }
     
@@ -246,9 +246,9 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         // return super.authenticated(request, response);
         
         // Modified copy of Authenticator.authenticated
-        if(this.log.isInfoEnabled())
+        if(this.log.isDebugEnabled())
         {
-            this.log.info("The authentication succeeded for the identifer \"{}\" using the {} scheme.", request
+            this.log.debug("The authentication succeeded for the identifer \"{}\" using the {} scheme.", request
                     .getChallengeResponse().getIdentifier(), request.getChallengeResponse().getScheme());
         }
         
@@ -279,14 +279,14 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
     @Override
     protected int beforeHandle(final Request request, final Response response)
     {
-        this.log.info("Calling isLoggingIn");
+        this.log.debug("Calling isLoggingIn");
         if(this.isLoggingIn(request, response))
         {
-            this.log.info("Calling isLoggingIn");
+            this.log.debug("Calling isLoggingIn");
             this.login(request, response);
             if(this.authenticate(request, response))
             {
-                this.log.info("Calling authenticated");
+                this.log.debug("Calling authenticated");
                 this.authenticated(request, response);
             }
             // we redirect after logging in for all cases, so stop here and return the 303 response
@@ -294,41 +294,41 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         }
         else if(this.isLoggingOut(request, response))
         {
-            this.log.info("Calling logout");
+            this.log.debug("Calling logout");
             return this.logout(request, response);
         }
         
         // log.info("calling super.beforeHandle");
         // return super.beforeHandle(request, response);
         
-        this.log.info("Calling copy of Authenticator beforeHandle");
+        this.log.debug("Calling copy of Authenticator beforeHandle");
         
         if(
         // FIXME: How important is multiAuthenticating to this class?
         // isMultiAuthenticating() ||
         !request.getClientInfo().isAuthenticated())
         {
-            this.log.info("Calling authenticate");
+            this.log.debug("Calling authenticate");
             if(this.authenticate(request, response))
             {
-                this.log.info("Calling authenticated");
+                this.log.debug("Calling authenticated");
                 return this.authenticated(request, response);
             }
             else if(this.isOptional())
             {
-                this.log.info("Authentication isOptional, returning CONTINUE with Status.SUCCESS_OK");
+                this.log.debug("Authentication isOptional, returning CONTINUE with Status.SUCCESS_OK");
                 response.setStatus(Status.SUCCESS_OK);
                 return Filter.CONTINUE;
             }
             else
             {
-                this.log.info("Calling unauthenticated");
+                this.log.debug("Calling unauthenticated");
                 return this.unauthenticated(request, response);
             }
         }
         else
         {
-            this.log.info("Returning CONTINUE");
+            this.log.debug("Returning CONTINUE");
             return Filter.CONTINUE;
         }
     }
@@ -339,7 +339,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
     @Override
     public void challenge(final Response response, final boolean stale)
     {
-        this.log.info("Calling super.challenge");
+        this.log.debug("Calling super.challenge");
         super.challenge(response, stale);
     }
     
@@ -627,7 +627,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         final CookieSetting credentialsCookie = this.getCredentialsCookie(request, response);
         credentialsCookie.setMaxAge(0);
         
-        this.log.info("calling attemptRedirect after logout");
+        this.log.debug("calling attemptRedirect after logout");
         // Attempt to redirect
         this.attemptRedirect(request, response);
         
