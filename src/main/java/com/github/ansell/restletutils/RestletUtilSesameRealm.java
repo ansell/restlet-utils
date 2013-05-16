@@ -41,11 +41,13 @@ import java.util.UUID;
 
 import org.openrdf.OpenRDFUtil;
 import org.openrdf.model.Literal;
+import org.openrdf.model.Model;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
+import org.openrdf.model.impl.LinkedHashModel;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
@@ -364,6 +366,60 @@ public class RestletUtilSesameRealm extends Realm
                 }
             }
         }
+    }
+    
+    public URI getUserUri(final String userIdentifier) throws RepositoryException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repository.getConnection();
+            
+            final Model result =
+                    new LinkedHashModel(Iterations.asList(conn.getStatements(null,
+                            SesameRealmConstants.OAS_USERIDENTIFIER, this.vf.createLiteral(userIdentifier), true,
+                            this.getContexts())));
+            
+            for(Resource nextUri : result.subjects())
+            {
+                if(nextUri instanceof URI)
+                {
+                    return (URI)nextUri;
+                }
+            }
+            
+            return null;
+        }
+        catch(final RepositoryException e)
+        {
+            this.log.error("Found repository exception while adding user", e);
+            try
+            {
+                conn.rollback();
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Found unexpected exception while rolling back repository connection after exception");
+            }
+            
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found unexpected repository exception", e);
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        
     }
     
     public URI addUser(final User nextUser)
