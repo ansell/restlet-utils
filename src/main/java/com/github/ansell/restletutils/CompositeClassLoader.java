@@ -1,5 +1,6 @@
 package com.github.ansell.restletutils;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,22 @@ public class CompositeClassLoader extends ClassLoader
         for(final ClassLoader cl : this.classLoaders)
         {
             final URL resource = cl.getResource(name);
+            
+            if(resource != null)
+            {
+                return resource;
+            }
+        }
+        
+        return null;
+    }
+    
+    @Override
+    public InputStream getResourceAsStream(final String name)
+    {
+        for(final ClassLoader cl : this.classLoaders)
+        {
+            final InputStream resource = cl.getResourceAsStream(name);
             
             if(resource != null)
             {
