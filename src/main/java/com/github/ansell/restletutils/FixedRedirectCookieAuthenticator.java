@@ -184,25 +184,41 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
      * @param response
      *            The current response.
      */
-    protected void attemptRedirect(final Request request, final Response response)
+    protected void attemptRedirect(final Request request, final Response response, final Form form)
     {
-        final String targetUri = request.getResourceRef().getQueryAsForm().getFirstValue(this.getRedirectQueryName());
+        this.log.info("redirectQueryName: {}", this.getRedirectQueryName());
+        this.log.info("query: {}", request.getResourceRef().getQueryAsForm());
+        this.log.info("form: {}", form);
+        
+        String targetUri = request.getResourceRef().getQueryAsForm().getFirstValue(this.getRedirectQueryName(), true);
+        
+        this.log.info("attemptRedirect: targetUri={}", targetUri);
+        
+        if(targetUri == null && form != null)
+        {
+            targetUri = form.getFirstValue(this.getRedirectQueryName(), true);
+        }
+        
+        this.log.info("attemptRedirect: targetUri={}", targetUri);
         
         if(targetUri != null)
         {
             response.redirectSeeOther(Reference.decode(targetUri));
+            return;
         }
         
         if(this.getFixedRedirectUri() != null)
         {
-            this.log.debug("attemptRedirect: fixedRedirectUri={}", this.getFixedRedirectUri());
+            this.log.info("attemptRedirect: fixedRedirectUri={}", this.getFixedRedirectUri());
             response.redirectSeeOther(this.getFixedRedirectUri());
+            return;
         }
         else
         {
-            this.log.debug("attemptRedirect: fixedRedirectUri={}",
+            this.log.info("attemptRedirect: fixedRedirectUri={}",
                     FixedRedirectCookieAuthenticator.DEFAULT_FIXED_REDIRECT_URI);
             response.redirectSeeOther(FixedRedirectCookieAuthenticator.DEFAULT_FIXED_REDIRECT_URI);
+            return;
         }
     }
     
@@ -609,7 +625,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         
         this.log.info("calling attemptRedirect after login");
         // Attempt to redirect
-        this.attemptRedirect(request, response);
+        this.attemptRedirect(request, response, form);
     }
     
     /**
@@ -627,9 +643,9 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         final CookieSetting credentialsCookie = this.getCredentialsCookie(request, response);
         credentialsCookie.setMaxAge(0);
         
-        this.log.debug("calling attemptRedirect after logout");
+        this.log.info("calling attemptRedirect after logout");
         // Attempt to redirect
-        this.attemptRedirect(request, response);
+        this.attemptRedirect(request, response, null);
         
         return Filter.STOP;
     }
