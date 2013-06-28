@@ -234,7 +234,15 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         
         if(credentialsCookie != null)
         {
-            request.setChallengeResponse(this.parseCredentials(credentialsCookie.getValue()));
+            ChallengeResponse credentials = this.parseCredentials(credentialsCookie.getValue());
+            if(credentials == null)
+            {
+                response.getCookieSettings().removeAll(this.getCookieName());
+            }
+            else
+            {
+                request.setChallengeResponse(credentials);
+            }
         }
         
         this.log.debug("Calling super.authenticate");
