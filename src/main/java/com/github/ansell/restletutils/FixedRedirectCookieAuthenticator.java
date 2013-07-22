@@ -697,7 +697,8 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
         }
         catch(final Exception e)
         {
-            this.log.info("Unable to decrypt cookie credentials", e);
+            this.log.info("Unable to decrypt cookie credentials");
+            this.log.trace("Unable to decrypt cookie credentials: Stacktrace:", e);
             return null;
         }
     }
