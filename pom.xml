@@ -10,7 +10,7 @@
 
 	<groupId>com.github.ansell.restlet-utils</groupId>
 	<artifactId>restlet-utils</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Restlet Utils</name>
 	<description>Utilities for use with Restlet</description>
