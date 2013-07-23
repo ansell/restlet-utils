@@ -422,6 +422,59 @@ public class RestletUtilSesameRealm extends Realm
         
     }
     
+    public String getUsername(final URI userURI) throws RepositoryException
+    {
+        RepositoryConnection conn = null;
+        try
+        {
+            conn = this.repository.getConnection();
+            
+            final Model result =
+                    new LinkedHashModel(Iterations.asList(conn.getStatements(userURI,
+                            SesameRealmConstants.OAS_USERIDENTIFIER, null, true, this.getContexts())));
+            
+            for(Value nextUsername : result.objects())
+            {
+                if(nextUsername instanceof Literal)
+                {
+                    return ((Literal)nextUsername).getLabel();
+                }
+            }
+            
+            return null;
+        }
+        catch(final RepositoryException e)
+        {
+            this.log.error("Found repository exception while adding user", e);
+            try
+            {
+                conn.rollback();
+            }
+            catch(final RepositoryException e1)
+            {
+                this.log.error("Found unexpected exception while rolling back repository connection after exception");
+            }
+            
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            if(conn != null)
+            {
+                try
+                {
+                    conn.close();
+                }
+                catch(final RepositoryException e)
+                {
+                    this.log.error("Found unexpected repository exception", e);
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+        
+    }
+    
     public URI addUser(final User nextUser)
     {
         URI nextUserUUID =
