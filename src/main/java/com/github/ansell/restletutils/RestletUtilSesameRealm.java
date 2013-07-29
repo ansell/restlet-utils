@@ -48,6 +48,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.impl.LinkedHashModel;
+import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.vocabulary.RDF;
 import org.openrdf.query.Binding;
 import org.openrdf.query.BindingSet;
@@ -182,7 +183,7 @@ public class RestletUtilSesameRealm extends Realm
     
     private URI[] userManagerContexts;
     
-    private ValueFactory vf;
+    protected ValueFactory vf;
     
     /** The modifiable list of role mappings. */
     // private final List<RoleMapping> roleMappings;
@@ -1435,7 +1436,7 @@ public class RestletUtilSesameRealm extends Realm
         }
         else
         {
-            this.vf = null;
+            this.vf = ValueFactoryImpl.getInstance();
         }
     }
     
