@@ -188,7 +188,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
     {
         this.log.info("redirectQueryName: {}", this.getRedirectQueryName());
         this.log.info("query: {}", request.getResourceRef().getQueryAsForm());
-        this.log.info("form: {}", form);
+        //this.log.info("form: {}", form);
         
         String targetUri = request.getResourceRef().getQueryAsForm().getFirstValue(this.getRedirectQueryName(), true);
         
