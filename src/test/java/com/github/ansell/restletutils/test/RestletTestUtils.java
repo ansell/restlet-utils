@@ -18,9 +18,9 @@ public class RestletTestUtils
 {
     
     // NOTE: These constants are defined to match users added in ApplicationUtils.setupApplication
-    public static final char[] TEST_PASSWORD = "testPassword".toCharArray();
+    public static final char[] TEST_PASSWORD = "anotherPassword".toCharArray();
     
-    public static final String TEST_USERNAME = "testUser";
+    public static final String TEST_USERNAME = "anotherUser";
     
     public static final char[] TEST_ADMIN_PASSWORD = "testAdminPassword".toCharArray();
     
