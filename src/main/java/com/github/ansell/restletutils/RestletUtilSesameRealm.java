@@ -1466,32 +1466,6 @@ public class RestletUtilSesameRealm extends Realm
     }
     
     /**
-     * Sets the modifiable list of users. This method clears the current list and adds all entries
-     * in the parameter list.
-     * 
-     * @param users
-     *            A list of users.
-     */
-    @Deprecated
-    private void setUsers(final List<RestletUtilUser> users)
-    {
-        throw new RuntimeException(
-                "TODO: Convert all calls to this method to add and remove methods, with optionally a reset/clear method");
-        // synchronized(this.getUsers())
-        // {
-        // if(users != this.getUsers())
-        // {
-        // this.getUsers().clear();
-        //
-        // if(users != null)
-        // {
-        // this.getUsers().addAll(users);
-        // }
-        // }
-        // }
-    }
-    
-    /**
      * Stores the group, including a root group statement if rootGroup is true.
      * 
      * @param nextGroup
