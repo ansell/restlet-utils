@@ -1120,7 +1120,7 @@ public class RestletUtilSesameRealm extends Realm
                                     }
                                     else
                                     {
-                                        this.log.warn(
+                                        this.log.info(
                                                 "Failed to find a role mapped user internally for the given user identifier: {}",
                                                 nextRoleMappingStatement);
                                     }
@@ -1151,13 +1151,13 @@ public class RestletUtilSesameRealm extends Realm
                         }
                         else
                         {
-                            this.log.error("Not adding incomplete role mapping to results: uri={}, partialMapping={}",
+                            this.log.info("Not adding incomplete role mapping to results: uri={}, partialMapping={}",
                                     nextRoleMappingUri, nextRoleMapping);
                         }
                     }
                     else
                     {
-                        this.log.warn("Found non-URI for role mapping, ignoring this role mapping: {}", next);
+                        this.log.info("Found non-URI for role mapping, ignoring this role mapping: {}", next);
                     }
                 }
             }
