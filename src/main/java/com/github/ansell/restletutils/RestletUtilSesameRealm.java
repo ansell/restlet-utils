@@ -301,6 +301,7 @@ public class RestletUtilSesameRealm extends Realm
             {
                 conn.rollback();
             }
+            throw e;
         }
         finally
         {
