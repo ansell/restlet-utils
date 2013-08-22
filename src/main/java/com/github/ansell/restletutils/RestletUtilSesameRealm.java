@@ -1115,7 +1115,7 @@ public class RestletUtilSesameRealm extends Realm
                                     }
                                     else
                                     {
-                                        this.log.warn(
+                                        this.log.info(
                                                 "Failed to find a role mapped user internally for the given user identifier: {}",
                                                 nextRoleMappingStatement);
                                     }
@@ -1146,13 +1146,13 @@ public class RestletUtilSesameRealm extends Realm
                         }
                         else
                         {
-                            this.log.error("Not adding incomplete role mapping to results: uri={}, partialMapping={}",
+                            this.log.info("Not adding incomplete role mapping to results: uri={}, partialMapping={}",
                                     nextRoleMappingUri, nextRoleMapping);
                         }
                     }
                     else
                     {
-                        this.log.warn("Found non-URI for role mapping, ignoring this role mapping: {}", next);
+                        this.log.info("Found non-URI for role mapping, ignoring this role mapping: {}", next);
                     }
                 }
             }
@@ -1455,32 +1455,6 @@ public class RestletUtilSesameRealm extends Realm
         // if(rootGroups != null)
         // {
         // this.getRootGroups().addAll(rootGroups);
-        // }
-        // }
-        // }
-    }
-    
-    /**
-     * Sets the modifiable list of users. This method clears the current list and adds all entries
-     * in the parameter list.
-     * 
-     * @param users
-     *            A list of users.
-     */
-    @Deprecated
-    private void setUsers(final List<RestletUtilUser> users)
-    {
-        throw new RuntimeException(
-                "TODO: Convert all calls to this method to add and remove methods, with optionally a reset/clear method");
-        // synchronized(this.getUsers())
-        // {
-        // if(users != this.getUsers())
-        // {
-        // this.getUsers().clear();
-        //
-        // if(users != null)
-        // {
-        // this.getUsers().addAll(users);
         // }
         // }
         // }
