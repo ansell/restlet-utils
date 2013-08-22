@@ -1005,11 +1005,6 @@ public class RestletUtilSesameRealm extends Realm
         return this.repository;
     }
     
-    /**
-     * Returns the modifiable list of role mappings.
-     * 
-     * @return The modifiable list of role mappings.
-     */
     private List<RoleMapping> getRoleMappings()
     {
         final List<RoleMapping> results = new ArrayList<RoleMapping>();
