@@ -588,6 +588,7 @@ public class RestletUtilSesameRealm extends Realm
         // log.info("result={}", bindingSet);
         
         String userEmail = bindingSet.getValue("userEmail").stringValue();
+        // TODO: When hashed, need to unhash here
         char[] userSecret = bindingSet.getValue("userSecret").stringValue().toCharArray();
         String userFirstName = null;
         if(bindingSet.hasBinding("userFirstName"))
