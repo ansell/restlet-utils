@@ -519,9 +519,12 @@ public class RestletUtilSesameRealm extends Realm
             conn.add(nextUserUUID, SesameRealmConstants.OAS_USERIDENTIFIER,
                     this.vf.createLiteral(nextUser.getIdentifier()), this.getContexts());
             
-            // TODO: Hash this
-            conn.add(nextUserUUID, SesameRealmConstants.OAS_USERSECRET,
-                    this.vf.createLiteral(new String(nextUser.getSecret())), this.getContexts());
+            if(nextUser.getSecret() != null)
+            {
+                // TODO: Hash this
+                conn.add(nextUserUUID, SesameRealmConstants.OAS_USERSECRET,
+                        this.vf.createLiteral(new String(nextUser.getSecret())), this.getContexts());
+            }
             
             if(nextUser.getFirstName() != null)
             {
@@ -626,7 +629,7 @@ public class RestletUtilSesameRealm extends Realm
         query.append(" { ");
         query.append("   ?userUri a <" + SesameRealmConstants.OAS_USER + "> . ");
         query.append("   ?userUri <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ?userIdentifier . ");
-        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERSECRET + "> ?userSecret . ");
+        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERSECRET + "> ?userSecret . } ");
         query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ?userFirstName . } ");
         query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERLASTNAME + "> ?userLastName . } ");
         query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USEREMAIL + "> ?userEmail . } ");
