@@ -949,10 +949,7 @@ public class RestletUtilSesameRealm extends Realm
             
             final String query = this.buildSparqlQueryToFindUser(userIdentifier, false);
             
-            if(this.log.isDebugEnabled())
-            {
-                this.log.debug("findUser: query={}", query);
-            }
+            this.log.debug("findUser: query={}", query);
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
@@ -968,7 +965,7 @@ public class RestletUtilSesameRealm extends Realm
                 }
                 else
                 {
-                    this.log.info("Could not find user with identifier: {}", userIdentifier);
+                    this.log.info("Could not find user with identifier, returning null: {}", userIdentifier);
                 }
             }
             finally
