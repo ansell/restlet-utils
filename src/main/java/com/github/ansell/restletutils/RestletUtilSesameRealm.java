@@ -33,11 +33,15 @@ package com.github.ansell.restletutils;
 import info.aduna.iteration.Iterations;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.openrdf.OpenRDFUtil;
 import org.openrdf.model.Literal;
@@ -59,6 +63,7 @@ import org.openrdf.query.QueryLanguage;
 import org.openrdf.query.TupleQuery;
 import org.openrdf.query.TupleQueryResult;
 import org.openrdf.query.impl.DatasetImpl;
+import org.openrdf.queryrender.RenderUtils;
 import org.openrdf.repository.Repository;
 import org.openrdf.repository.RepositoryConnection;
 import org.openrdf.repository.RepositoryException;
@@ -631,15 +636,27 @@ public class RestletUtilSesameRealm extends Realm
         query.append(" SELECT ?userIdentifier ?userUri ?userSecret ?userFirstName ?userLastName ?userEmail ");
         query.append(" WHERE ");
         query.append(" { ");
-        query.append("   ?userUri a <" + SesameRealmConstants.OAS_USER + "> . ");
-        query.append("   ?userUri <" + SesameRealmConstants.OAS_USERIDENTIFIER + "> ?userIdentifier . ");
-        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERSECRET + "> ?userSecret . } ");
-        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERFIRSTNAME + "> ?userFirstName . } ");
-        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USERLASTNAME + "> ?userLastName . } ");
-        query.append("   OPTIONAL{ ?userUri <" + SesameRealmConstants.OAS_USEREMAIL + "> ?userEmail . } ");
+        query.append("   ?userUri a ");
+        query.append(RenderUtils.getSPARQLQueryString(SesameRealmConstants.OAS_USER));
+        query.append(" . ");
+        query.append("   ?userUri ");
+        query.append(RenderUtils.getSPARQLQueryString(SesameRealmConstants.OAS_USERIDENTIFIER));
+        query.append(" ?userIdentifier . ");
+        query.append("   OPTIONAL{ ?userUri ");
+        query.append(RenderUtils.getSPARQLQueryString(SesameRealmConstants.OAS_USERSECRET));
+        query.append(" ?userSecret . } ");
+        query.append("   OPTIONAL{ ?userUri ");
+        query.append(RenderUtils.getSPARQLQueryString(SesameRealmConstants.OAS_USERFIRSTNAME));
+        query.append(" ?userFirstName . } ");
+        query.append("   OPTIONAL{ ?userUri ");
+        query.append(RenderUtils.getSPARQLQueryString(SesameRealmConstants.OAS_USERLASTNAME));
+        query.append(" ?userLastName . } ");
+        query.append("   OPTIONAL{ ?userUri ");
+        query.append(RenderUtils.getSPARQLQueryString(SesameRealmConstants.OAS_USEREMAIL));
+        query.append(" ?userEmail . } ");
         if(!findAllUsers)
         {
-            query.append("   FILTER(str(?userIdentifier) = \"" + NTriplesUtil.escapeString(userIdentifier) + "\") ");
+            query.append("   FILTER(str(?userIdentifier) = \"" + RenderUtils.escape(userIdentifier) + "\") ");
         }
         query.append(" } ");
         return query.toString();
@@ -1311,9 +1328,9 @@ public class RestletUtilSesameRealm extends Realm
     }
     
     /**
-     * Returns the modifiable list of users.
+     * Returns an unmodifiable list of users.
      * 
-     * @return The modifiable list of users.
+     * @return An unmodifiable list of users.
      */
     public List<RestletUtilUser> getUsers()
     {
@@ -1326,10 +1343,7 @@ public class RestletUtilSesameRealm extends Realm
             
             final String query = this.buildSparqlQueryToFindUser(null, true);
             
-            if(this.log.isDebugEnabled())
-            {
-                this.log.debug("findUser: query={}", query);
-            }
+            this.log.debug("findUser: query={}", query);
             
             final TupleQuery tupleQuery = conn.prepareTupleQuery(QueryLanguage.SPARQL, query);
             
@@ -1372,6 +1386,23 @@ public class RestletUtilSesameRealm extends Realm
             catch(final RepositoryException e)
             {
                 this.log.error("Failure to close connection", e);
+            }
+        }
+        
+        return Collections.unmodifiableList(result);
+    }
+    
+    public Map<String, RestletUtilUser> getUsersMapByIdentifier()
+    {
+        ConcurrentMap<String, RestletUtilUser> result = new ConcurrentHashMap<String, RestletUtilUser>();
+        
+        for(RestletUtilUser nextUser : this.getUsers())
+        {
+            RestletUtilUser putIfAbsent = result.putIfAbsent(nextUser.getIdentifier(), nextUser);
+            
+            if(putIfAbsent != null)
+            {
+                this.log.error("Found duplicate user identifier for different users: {} {}", putIfAbsent, nextUser);
             }
         }
         
