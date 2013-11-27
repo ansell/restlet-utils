@@ -8,6 +8,7 @@
 # Maven temporary directory #
 
 target/
+pom.xml.versionsBackup
 
 # Eclipse temporary files #
 
