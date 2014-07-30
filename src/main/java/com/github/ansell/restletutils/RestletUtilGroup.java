@@ -21,8 +21,8 @@ public class RestletUtilGroup extends Group
     }
     
     /**
-     * @param name
-     * @param description
+     * @param name The name for the Group.
+     * @param description The description for the Group
      */
     public RestletUtilGroup(final String name, final String description)
     {
@@ -31,9 +31,9 @@ public class RestletUtilGroup extends Group
     }
     
     /**
-     * @param name
-     * @param description
-     * @param inheritingRoles
+     * @param name The name for the Group.
+     * @param description The description for the Group.
+     * @param inheritingRoles True to inherit roles, and false otherwise.
      */
     public RestletUtilGroup(final String name, final String description, final boolean inheritingRoles)
     {

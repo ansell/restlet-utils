@@ -183,6 +183,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
      *            The current request.
      * @param response
      *            The current response.
+     * @param form The query parameters.
      */
     protected void attemptRedirect(final Request request, final Response response, final Form form)
     {
@@ -373,7 +374,8 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
      * @param challenge
      *            The challenge response to format.
      * @return The raw credentials.
-     * @throws GeneralSecurityException
+     * @throws GeneralSecurityException 
+     * 			  If the credentials cannot be encrypted.
      */
     protected String formatCredentials(final ChallengeResponse challenge) throws GeneralSecurityException
     {
@@ -643,6 +645,7 @@ public class FixedRedirectCookieAuthenticator extends ChallengeAuthenticator
      *            The current request.
      * @param response
      *            The current response.
+     * @return Return {@link Filter#STOP}.
      */
     protected int logout(final Request request, final Response response)
     {

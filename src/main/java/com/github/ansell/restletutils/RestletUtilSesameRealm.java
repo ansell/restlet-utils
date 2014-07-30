@@ -201,6 +201,8 @@ public class RestletUtilSesameRealm extends Realm
     
     /**
      * Constructor.
+     * @param repository The Repository to use to back the realm.
+     * @param contexts The contexts to store information in and search for information from.
      */
     public RestletUtilSesameRealm(final Repository repository, final URI... contexts)
     {
@@ -328,7 +330,7 @@ public class RestletUtilSesameRealm extends Realm
      * Adds a fully populated root group to the underlying repository, including a statement
      * indicating that this group is a root group.
      * 
-     * @param nextRootGroup
+     * @param nextRootGroup The next root group to add.
      */
     public void addRootGroup(final Group nextRootGroup)
     {
@@ -622,6 +624,7 @@ public class RestletUtilSesameRealm extends Realm
      * 
      * @param userIdentifier
      *            The unique identifier of the User to search for.
+     * @param findAllUsers True to find all users, and false to only find the specified user.
      * @return A String representation of the SPARQL Select query
      */
     protected String buildSparqlQueryToFindUser(final String userIdentifier, boolean findAllUsers)
@@ -1208,8 +1211,8 @@ public class RestletUtilSesameRealm extends Realm
     }
     
     /**
-     * @param role
-     * @return
+     * @param name The Role name.
+     * @return The RestletUtilRole matching the name.
      */
     protected RestletUtilRole getRoleByName(final String name)
     {
@@ -1218,8 +1221,8 @@ public class RestletUtilSesameRealm extends Realm
     }
     
     /**
-     * @param nextRoleMappingStatement
-     * @return
+     * @param uri The URI of the Role to find
+     * @return A RestletUtilRole matching the URI.
      */
     protected RestletUtilRole getRoleByUri(final URI uri)
     {
